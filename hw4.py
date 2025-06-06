@@ -1,4 +1,6 @@
 import numpy as np
+from fontTools.misc.bezierTools import epsilon
+
 
 def add_bias_term(X):
     """
@@ -114,7 +116,10 @@ class LogisticRegressionGD():
         y_01 = np.where(y == self.class_names[0], 0, 1) # represents the class 0/1 labels
         loss = None
         ###########################################################################
-        # TODO: Implement the function in section below.                          #
+        z = X @ self.w_
+        sigmoid = 1 / (1 + np.exp(-z))
+        eps = 1e-15
+        loss = -np.mean(y_01 * np.log(sigmoid + eps) + (1 - y_01) * np.log(1 - sigmoid + eps))
         ###########################################################################
  
         ###########################################################################
@@ -153,8 +158,17 @@ class LogisticRegressionGD():
         self.w_ = 1e-6 * np.random.randn(X.shape[1])
 
         ###########################################################################
-        # TODO: Implement the function in section below.                          #
-        ###########################################################################
+        for i in range(self.max_iter):
+            z = X @ self.w_
+            sigmoid = 1 / (1 + np.exp(-z))
+            current_loss = self.BCE_loss(X,y)
+            loss.append(current_loss)
+            if i > 0 and abs(loss[i] - loss[i-1]) < self.eps:
+                break
+            gradient = X.T @ (sigmoid - y_01) / X.shape[0]
+            self.w_ += -1 * self.learning_rate * gradient
+
+    ###########################################################################
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
@@ -233,9 +247,34 @@ def cv_accuracy_and_bce_error(X, y, n_folds):
     accuracies = []
     BCE_losses = []
 
-    ###########################################################################
-    # TODO: Implement the function in section below.                          #
-    ###########################################################################
+    for i in range(n_folds):
+        
+        # cerate the validation set from the i-th fold
+        X_val = X_splits[i]
+        y_val = y_splits[i]
+
+        # create the training set from the others
+        X_train = np.concatenate([X_splits[j] for j in range(n_folds) if j != i])
+        y_train = np.concatenate([y_splits[j] for j in range(n_folds) if j != i])
+
+        # init LogisticRegressionGD 
+        model = LogisticRegressionGD()
+
+        # fit model to training
+        model.fit(X_train, y_train)
+
+        # predict probs
+        y_pred_prob = model.predict_proba(X_val)
+
+        # calculate predicted class labels 
+        y_pred = model.predict(X_val, threshold=0.5)
+
+        # calculate accuracy and BCE loss
+        accuracy = np.mean(y_pred == y_val)
+        bce_loss = model.BCE_loss(X_val, y_val)
+
+        accuracies.append(accuracy)
+        BCE_losses.append(bce_loss)
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
