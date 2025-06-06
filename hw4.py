@@ -310,7 +310,20 @@ def fpr_tpr_per_threshold(y_true, positive_class_probs, positive_class="9"):
     y_true_binary = np.where(y_true == positive_class, 1, 0)
     
     ###########################################################################
-    # TODO: Implement the function in section below.                          #
+    for thresh in prob_thresholds:
+        y_pred_binary = (positive_class_probs >= thresh).astype(int)
+
+        tp = np.sum((y_true_binary == 1) & (y_pred_binary == 1))
+        fn = np.sum((y_true_binary == 1) & (y_pred_binary == 0))
+        tn = np.sum((y_true_binary == 0) & (y_pred_binary == 0))
+        fp = np.sum((y_true_binary == 0) & (y_pred_binary == 1))
+
+        tpr_val = tp / (tp + fn) if (tp + fn) > 0 else 0
+        fpr_val = fp / (fp + tn) if (fp + tn) > 0 else 0
+
+        tpr.append(tpr_val)
+        fpr.append(fpr_val)
+
     ###########################################################################
 
     ###########################################################################
