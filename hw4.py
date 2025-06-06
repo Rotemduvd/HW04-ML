@@ -259,7 +259,24 @@ def calc_and_print_metrics(y_true, y_pred, positive_class):
     f1 = None
 
     ###########################################################################
-    # TODO: Implement the function in section below.                          #
+    eps = 1e-15
+
+    tn = np.sum((y_true != positive_class) & (y_pred != positive_class))
+    tp = np.sum((y_true == positive_class) & (y_pred == positive_class))
+    fn = np.sum((y_true == positive_class) & (y_pred != positive_class))
+    fp = np.sum((y_true != positive_class) & (y_pred == positive_class))
+
+    tpr = tp / (tp + fn )
+    tnr = tn / (tn + fp)
+    fpr = fp / (tn + fp)
+    fnr = fn / (tp + fn)
+
+
+    accuracy = (tp + tn) /(tp + fp + tn + fn)
+    risk = (fp + fn) / (tp + fp + tn + fn)
+    recall = tpr
+    precision= tp / (tp + fp + eps)
+    f1 = 2 * (precision * recall)/(precision + recall + eps)
     ###########################################################################
 
     ###########################################################################
