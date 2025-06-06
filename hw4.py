@@ -1,4 +1,6 @@
 import numpy as np
+from fontTools.misc.bezierTools import epsilon
+
 
 def add_bias_term(X):
     """
@@ -114,7 +116,10 @@ class LogisticRegressionGD():
         y_01 = np.where(y == self.class_names[0], 0, 1) # represents the class 0/1 labels
         loss = None
         ###########################################################################
-        # TODO: Implement the function in section below.                          #
+        z = X @ self.w_
+        sigmoid = 1 / (1 + np.exp(-z))
+        eps = 1e-15
+        loss = -np.mean(y_01 * np.log(sigmoid + eps) + (1 - y_01) * np.log(1 - sigmoid + eps))
         ###########################################################################
  
         ###########################################################################
@@ -153,8 +158,17 @@ class LogisticRegressionGD():
         self.w_ = 1e-6 * np.random.randn(X.shape[1])
 
         ###########################################################################
-        # TODO: Implement the function in section below.                          #
-        ###########################################################################
+        for i in range(self.max_iter):
+            z = X @ self.w_
+            sigmoid = 1 / (1 + np.exp(-z))
+            current_loss = self.BCE_loss(X,y)
+            loss.append(current_loss)
+            if i > 0 and abs(loss[i] - loss[i-1]) < self.eps:
+                break
+            gradient = X.T @ (sigmoid - y_01) / X.shape[0]
+            self.w_ += -1 * self.learning_rate * gradient
+
+    ###########################################################################
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
