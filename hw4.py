@@ -4,11 +4,8 @@ def add_bias_term(X):
     """
     Add a bias term to each sample of the input data.
     """
-
-    ###########################################################################
-    # TODO: Implement the function in section below.                          #
-    ###########################################################################
-    
+    bias = np.ones((X.shape[0], 1))
+    X = np.hstack((bias, X))  
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -61,9 +58,8 @@ class LogisticRegressionGD():
         """
         class_1_prob = np.nan * np.ones(X.shape[0])
 
-        ###########################################################################
-        # TODO: Implement the function in section below.                          #
-        ###########################################################################
+        wx = X @ self.w_
+        class_1_prob = 1 / (1 + np.exp(-wx))
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
@@ -87,9 +83,8 @@ class LogisticRegressionGD():
         """
         y_pred = np.nan * np.ones(X.shape[0])
     
-        ###########################################################################
-        # TODO: Implement the function in section below.                          #
-        ###########################################################################
+        probs = self.predict_proba(X)
+        y_pred = (probs >= threshold).astype(int)
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
