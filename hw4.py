@@ -259,7 +259,24 @@ def calc_and_print_metrics(y_true, y_pred, positive_class):
     f1 = None
 
     ###########################################################################
-    # TODO: Implement the function in section below.                          #
+    eps = 1e-15
+
+    tn = np.sum((y_true != positive_class) & (y_pred != positive_class))
+    tp = np.sum((y_true == positive_class) & (y_pred == positive_class))
+    fn = np.sum((y_true == positive_class) & (y_pred != positive_class))
+    fp = np.sum((y_true != positive_class) & (y_pred == positive_class))
+
+    tpr = tp / (tp + fn )
+    tnr = tn / (tn + fp)
+    fpr = fp / (tn + fp)
+    fnr = fn / (tp + fn)
+
+
+    accuracy = (tp + tn) /(tp + fp + tn + fn)
+    risk = (fp + fn) / (tp + fp + tn + fn)
+    recall = tpr
+    precision= tp / (tp + fp + eps)
+    f1 = 2 * (precision * recall)/(precision + recall + eps)
     ###########################################################################
 
     ###########################################################################
@@ -293,7 +310,20 @@ def fpr_tpr_per_threshold(y_true, positive_class_probs, positive_class="9"):
     y_true_binary = np.where(y_true == positive_class, 1, 0)
     
     ###########################################################################
-    # TODO: Implement the function in section below.                          #
+    for thresh in prob_thresholds:
+        y_pred_binary = (positive_class_probs >= thresh).astype(int)
+
+        tp = np.sum((y_true_binary == 1) & (y_pred_binary == 1))
+        fn = np.sum((y_true_binary == 1) & (y_pred_binary == 0))
+        tn = np.sum((y_true_binary == 0) & (y_pred_binary == 0))
+        fp = np.sum((y_true_binary == 0) & (y_pred_binary == 1))
+
+        tpr_val = tp / (tp + fn) if (tp + fn) > 0 else 0
+        fpr_val = fp / (fp + tn) if (fp + tn) > 0 else 0
+
+        tpr.append(tpr_val)
+        fpr.append(fpr_val)
+
     ###########################################################################
 
     ###########################################################################
