@@ -186,9 +186,21 @@ def select_learning_rate(X_train, y_train, learning_rates, max_iter):
     min_bce = float('inf')
     selected_learning_rate = None
     
-    ###########################################################################
-    # TODO: Implement the function in section below.                          #
-    ###########################################################################
+    for lr in learning_rates:
+        # logistic regression model with the current learning rate
+        model = LogisticRegressionGD(learning_rate=lr, max_iter=max_iter)
+        
+        # use the fit method to train the model
+        model.fit(X_train, y_train)
+        
+        # calculate BCE loss
+        bce_loss = model.BCE_loss(X_train, y_train)
+        
+        # check for minimum BCE
+        if bce_loss < min_bce:
+            min_bce = bce_loss
+            selected_learning_rate = lr
+        
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
