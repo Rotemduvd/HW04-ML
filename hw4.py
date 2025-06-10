@@ -84,9 +84,9 @@ class LogisticRegressionGD():
           Default is 0.5. 
         """
         y_pred = np.nan * np.ones(X.shape[0])
-    
+
         probs = self.predict_proba(X)
-        y_pred = (probs >= threshold).astype(int)
+        y_pred = np.where(probs >= threshold, self.class_names[0], self.class_names[1])
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
