@@ -263,9 +263,6 @@ def cv_accuracy_and_bce_error(X, y, n_folds):
         # fit model to training
         model.fit(X_train, y_train)
 
-        # predict probs
-        y_pred_prob = model.predict_proba(X_val)
-
         # calculate predicted class labels 
         y_pred = model.predict(X_val, threshold=0.5)
 
