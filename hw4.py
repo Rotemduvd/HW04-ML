@@ -84,9 +84,9 @@ class LogisticRegressionGD():
           Default is 0.5. 
         """
         y_pred = np.nan * np.ones(X.shape[0])
-    
+
         probs = self.predict_proba(X)
-        y_pred = (probs >= threshold).astype(int)
+        y_pred = np.where(probs >= threshold, self.class_names[0], self.class_names[1])
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
@@ -200,9 +200,21 @@ def select_learning_rate(X_train, y_train, learning_rates, max_iter):
     min_bce = float('inf')
     selected_learning_rate = None
     
-    ###########################################################################
-    # TODO: Implement the function in section below.                          #
-    ###########################################################################
+    for lr in learning_rates:
+        # logistic regression model with the current learning rate
+        model = LogisticRegressionGD(learning_rate=lr, max_iter=max_iter)
+        
+        # use the fit method to train the model
+        model.fit(X_train, y_train)
+        
+        # calculate BCE loss
+        bce_loss = model.BCE_loss(X_train, y_train)
+        
+        # check for minimum BCE
+        if bce_loss < min_bce:
+            min_bce = bce_loss
+            selected_learning_rate = lr
+        
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -235,9 +247,34 @@ def cv_accuracy_and_bce_error(X, y, n_folds):
     accuracies = []
     BCE_losses = []
 
-    ###########################################################################
-    # TODO: Implement the function in section below.                          #
-    ###########################################################################
+    for i in range(n_folds):
+        
+        # cerate the validation set from the i-th fold
+        X_val = X_splits[i]
+        y_val = y_splits[i]
+
+        # create the training set from the others
+        X_train = np.concatenate([X_splits[j] for j in range(n_folds) if j != i])
+        y_train = np.concatenate([y_splits[j] for j in range(n_folds) if j != i])
+
+        # init LogisticRegressionGD 
+        model = LogisticRegressionGD()
+
+        # fit model to training
+        model.fit(X_train, y_train)
+
+        # predict probs
+        y_pred_prob = model.predict_proba(X_val)
+
+        # calculate predicted class labels 
+        y_pred = model.predict(X_val, threshold=0.5)
+
+        # calculate accuracy and BCE loss
+        accuracy = np.mean(y_pred == y_val)
+        bce_loss = model.BCE_loss(X_val, y_val)
+
+        accuracies.append(accuracy)
+        BCE_losses.append(bce_loss)
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
