@@ -86,7 +86,7 @@ class LogisticRegressionGD():
         y_pred = np.nan * np.ones(X.shape[0])
 
         probs = self.predict_proba(X)
-        y_pred = np.where(probs >= threshold, self.class_names[0], self.class_names[1])
+        y_pred = np.where(probs >= threshold, self.class_names[1], self.class_names[0])
 
         ###########################################################################
         #                             END OF YOUR CODE                            #
